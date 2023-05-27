@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Колоризація зображень</title>
+</head>
+<body>
+    <h1>Колоризація зображень</h1>
+    <form action="/colorize" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required><br><br>
+        <input type="submit" value="Колоризувати зображення">
+    </form>
+    <br>
+    <h2>Результат колоризації:</h2>
+    <img id="result-img" src="../colorized_image.jpg" alt="Colorized Image">
+    <br>
+    <a id="download-link" href="" download>Завантажити</a>
+
+    <script>
+        // Функція для обробки відповіді від сервера та встановлення зображення результату
+        function handleResponse(response) {
+            // var img = document.getElementById("result-img");
+            // var downloadLink = document.getElementById("download-link");
+            //
+            // img.src = "data:image/jpeg;base64," + response.image;
+            // downloadLink.href = "data:image/jpeg;base64," + response.image;
+            var img = document.getElementById("result-img");
+            // img.src = response.image_url;
+        }
+
+        // Функція для відправки запиту на сервер
+        function colorizeImage() {
+            var form = document.querySelector("form");
+            var formData = new FormData(form);
+
+            fetch('/colorize', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(handleResponse);
+        }
+    </script>
+</body>
+</html>
