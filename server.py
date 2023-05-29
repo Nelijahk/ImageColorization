@@ -1,11 +1,12 @@
-from flask import Flask, render_template, request, send_file, jsonify
-import cv2, os
-import numpy as np
-from keras.models import load_model
-import tempfile
-from PIL import Image
 import base64
 import io
+
+import cv2
+import numpy as np
+import os
+from PIL import Image
+from flask import Flask, render_template, request, send_file, jsonify
+from keras.models import load_model
 
 # Завантаження моделі для колоризації
 model = load_model('model')
@@ -13,10 +14,12 @@ model = load_model('model')
 # Ініціалізація Flask додатку
 app = Flask(__name__)
 
+
 # Головна сторінка
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 # Маршрут для обробки POST-запиту зі зображенням для колоризації
 @app.route('/colorize', methods=['POST'])
@@ -57,7 +60,8 @@ def colorize():
 
     # Повертаємо посилання на кольорове зображення та саме зображення у відповіді
     colorized_image_url = f'{request.host_url}colorized_image.jpg'
-    return jsonify({'image_url': colorized_image_url, 'image': base64_image})
+    # return jsonify({'image_url': colorized_image_url, 'image': base64_image})
+    return render_template('index.html')
 
 
 # Маршрут для отримання кольоризованого зображення
@@ -71,6 +75,7 @@ def get_colorized_image():
         return send_file(colorized_image_path, mimetype='image/jpeg')
     else:
         return jsonify({'error': 'Colorized image not found'})
+
 
 if __name__ == '__main__':
     app.run()

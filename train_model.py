@@ -6,6 +6,7 @@ from keras.layers import Input, Conv2D, Conv2DTranspose, concatenate, MaxPooling
 from keras.optimizers import Adam, SGD
 from keras.models import load_model
 
+
 def build_colorization_model(input_shape):
     inputs = Input(shape=input_shape)
 
