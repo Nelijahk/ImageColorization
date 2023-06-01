@@ -59,5 +59,12 @@ The application will generate colorized versions of the grayscale images provide
 
 Additionally, the cross-validation script will provide evaluation metrics such as accuracy and loss during cross-validation, giving insights into the model's performance.
 
+## Examples
+![1](examples/example1.jpg)
+![2](examples/example2.jpg)
+![3](examples/example3.jpg)
+![4](examples/example4.jpg)
+![5](examples/example5.jpg)
+
 ## Conclusion
 The image colorization project aims to automate the process of adding color to grayscale images. By following the steps mentioned above, you can train a model, preprocess data, generate features, and evaluate the model's performance. Deploying the application allows users to conveniently colorize their grayscale images and obtain the corresponding colorized versions.
