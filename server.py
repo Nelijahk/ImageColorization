@@ -51,7 +51,7 @@ def colorize():
     save_path = os.path.join(save_dir, f'colorized_image.png')
     pil_image.save(save_path)
 
-    return render_template('index.html')
+    return jsonify({'image_url':  f'{request.host_url}colorized_image.jpg'})
 
 # Маршрут для отримання кольоризованого зображення
 @app.route('/colorized_image.jpg')

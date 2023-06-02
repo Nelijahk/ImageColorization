@@ -56,7 +56,7 @@
             <span class="model-input-col">
                 <h2 style="color: #99b7ea">Upload your file here</h2>
 
-                <form class="show-for-file-upload-mode" action="/colorize" method="post" enctype="multipart/form-data">
+                <form class="show-for-file-upload-mode" action="javascript:colorizeImage()" enctype="multipart/form-data">
                     <input type="file" name="image" accept="image/*" required/>
                     <br><br>
                     <button style="background-color: #99b7ea; border-radius: 20px; margin-left: 40px; font-size: 24px; padding:3% 6%" type="submit" id="enhance-model-image">Colorize</button>
@@ -70,36 +70,27 @@
           </div>
       </div>
         <h2 id="result-heading" style="text-align:center; color: white; font-size: 36px; display: none;">Result:</h2>
-        <img id="result-img" src="../colorized_image.jpg" alt="Colorized Image" style="display: none; margin: 0 auto">
+        <img id="result-img" src="" alt="Colorized Image" style="display: none; margin: 0 auto">
         <br>
         <div class="edit-buttons-container">
-            <a id="download-link" href="../colorized_image.jpg" download style="display: none; color: #99b7ea;">Download</a>
+            <a id="download-link" href="" download style="display: none; color: #99b7ea;">Download</a>
         </div>
     </div>
 
     <script>
-        var imageExists = new Image();
-        imageExists.src = "../colorized_image.jpg";
-        imageExists.onload = function() {
-            // Якщо зображення існує, показати рядок "Result:"
+        // Функція для обробки відповіді від сервера та встановлення зображення результату
+        function handleResponse() {
+            // показати рядок "Result:"
             var resultHeading = document.getElementById("result-heading");
             resultHeading.style.display = "block";
             // Показати зображення
-             var resultImg = document.getElementById("result-img");
-             resultImg.style.display = "block";
-             // Показати посилання для завантаження
-             var downloadLink = document.getElementById("download-link");
-             downloadLink.style.display = "inline";
-        };
-        // Функція для обробки відповіді від сервера та встановлення зображення результату
-        function handleResponse(response) {
-            // var img = document.getElementById("result-img");
-            // var downloadLink = document.getElementById("download-link");
-            //
-            // img.src = "data:image/jpeg;base64," + response.image;
-            // downloadLink.href = "data:image/jpeg;base64," + response.image;
-            var img = document.getElementById("result-img");
-            // img.src = response.image_url;
+            var resultImg = document.getElementById("result-img");
+            resultImg.style.display = "block";
+            resultImg.src = "http://127.0.0.1:5000/colorized_image.jpg?t=" + new Date().getTime();
+            // Показати посилання для завантаження
+            var downloadLink = document.getElementById("download-link");
+            downloadLink.style.display = "inline";
+            downloadLink.href = "http://127.0.0.1:5000/colorized_image.jpg?t=" + new Date().getTime();
         }
 
         // Функція для відправки запиту на сервер
