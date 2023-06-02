@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, send_file, jsonify
 from keras.models import load_model
 
 # Завантаження моделі для колоризації
-model = load_model('train_model(2)')
+model = load_model('model(5)')
 
 save_dir = 'colorized_images'
 os.makedirs(save_dir, exist_ok=True)
@@ -36,7 +36,7 @@ def colorize():
 
     # Виконуємо операції для кольоризації зображення
     img = np.expand_dims(img, axis=0)
-    pred_img = model.predict(img)
+    pred_img = model.predict([img, img])
 
     pred_img = pred_img.reshape(160, 160, 3)
     pred_img = cv2.resize(pred_img, (320, 320), interpolation=cv2.INTER_LANCZOS4)
@@ -51,7 +51,7 @@ def colorize():
     save_path = os.path.join(save_dir, f'colorized_image.png')
     pil_image.save(save_path)
 
-    return render_template('index.html')
+    return jsonify({'image_url':  f'{request.host_url}colorized_image.jpg'})
 
 # Маршрут для отримання кольоризованого зображення
 @app.route('/colorized_image.jpg')

@@ -1,9 +1,5 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-import tensorflow as tf
-from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D, Reshape
-from keras.models import Sequential
-from keras.callbacks import EarlyStopping
 from keras.models import load_model
 import matplotlib.pyplot as plt
 import pickle
@@ -28,10 +24,10 @@ train_color_img = np.reshape(train_color_img, (len(train_color_img), 160, 160, 3
 test_gray_img = np.reshape(test_gray_img, (len(test_gray_img), 160, 160, 3))
 test_color_img = np.reshape(test_color_img, (len(test_color_img), 160, 160, 3))
 
-model = load_model('model')
+model = load_model('model(5)')
 
 # Отримання прогнозів моделі для тестових зображень
-predictions = model.predict(test_gray_img)
+predictions = model.predict([test_gray_img, test_gray_img])
 
 # Вибір трьох випадкових індексів
 random_indices = np.random.choice(len(test_gray_img), 10, replace=False)
@@ -57,3 +53,7 @@ for index in random_indices:
     plt.axis('off')
 
     plt.show()
+
+loss, acc = model.evaluate([test_gray_img, test_gray_img], test_color_img, verbose=0)
+print('Loss:', loss)
+print('Accuracy:', acc)

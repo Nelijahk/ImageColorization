@@ -67,5 +67,5 @@ with open('color_img.pkl', 'wb') as f:
 with open('gray_img.pkl', 'wb') as f:
     pickle.dump(gray_img, f)
 
-for i in range(3, 10):
-    plot_images(color_img[i], gray_img[i])
+# for i in range(3, 10):
+#     plot_images(color_img[i], gray_img[i])

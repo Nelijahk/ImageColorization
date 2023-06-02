@@ -9,9 +9,12 @@ from keras.models import load_model
 
 def build_colorization_model(input_shape):
     inputs = Input(shape=input_shape)
+    condition = Input(shape=(160, 160, 3))
+
+    concatenated_input = concatenate([inputs, condition], axis=3)
 
     # Енкодер
-    conv1 = Conv2D(16, (3, 3), activation='relu', padding='same')(inputs)
+    conv1 = Conv2D(16, (3, 3), activation='relu', padding='same')(concatenated_input)
     conv1 = Conv2D(16, (3, 3), activation='relu', padding='same')(conv1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
 
@@ -27,39 +30,30 @@ def build_colorization_model(input_shape):
     conv4 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv4)
     pool4 = MaxPooling2D(pool_size=(2, 2))(conv4)
 
-    conv5 = Conv2D(256, (3, 3), activation='relu', padding='same')(pool4)
-    conv5 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv5)
-    pool5 = MaxPooling2D(pool_size=(2, 2))(conv5)
-
     # Декодер
-    up6 = Conv2DTranspose(128, (2, 2), strides=(2, 2), padding='same')(pool5)
-    up6 = concatenate([up6, conv5], axis=3)
-    conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(up6)
-    conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv6)
+    up6 = Conv2DTranspose(64, (2, 2), strides=(2, 2), padding='same')(pool4)
+    up6 = concatenate([up6, conv4], axis=3)
+    conv6 = Conv2D(128, (3, 3), activation='relu', padding='same')(up6)
+    conv6 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv6)
 
-    up7 = Conv2DTranspose(64, (2, 2), strides=(2, 2), padding='same')(conv6)
-    up7 = concatenate([up7, conv4], axis=3)
-    conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(up7)
-    conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv7)
+    up7 = Conv2DTranspose(32, (2, 2), strides=(2, 2), padding='same')(conv6)
+    up7 = concatenate([up7, conv3], axis=3)
+    conv7 = Conv2D(64, (3, 3), activation='relu', padding='same')(up7)
+    conv7 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv7)
 
-    up8 = Conv2DTranspose(32, (2, 2), strides=(2, 2), padding='same')(conv7)
-    up8 = concatenate([up8, conv3], axis=3)
-    conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(up8)
-    conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv8)
+    up8 = Conv2DTranspose(16, (2, 2), strides=(2, 2), padding='same')(conv7)
+    up8 = concatenate([up8, conv2], axis=3)
+    conv8 = Conv2D(32, (3, 3), activation='relu', padding='same')(up8)
+    conv8 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv8)
 
     up9 = Conv2DTranspose(16, (2, 2), strides=(2, 2), padding='same')(conv8)
-    up9 = concatenate([up9, conv2], axis=3)
-    conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(up9)
-    conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv9)
+    up9 = concatenate([up9, conv1], axis=3)
+    conv9 = Conv2D(16, (3, 3), activation='relu', padding='same')(up9)
+    conv9 = Conv2D(16, (3, 3), activation='relu', padding='same')(conv9)
 
-    up10 = Conv2DTranspose(16, (2, 2), strides=(2, 2), padding='same')(conv9)
-    up10 = concatenate([up10, conv1], axis=3)
-    conv10 = Conv2D(16, (3, 3), activation='relu', padding='same')(up10)
-    conv10 = Conv2D(16, (3, 3), activation='relu', padding='same')(conv10)
+    outputs = Conv2D(3, (1, 1), activation='tanh')(conv9)
 
-    outputs = Conv2D(3, (1, 1), activation='sigmoid')(conv10)
-
-    model = Model(inputs=inputs, outputs=outputs)
+    model = Model(inputs=[inputs, condition], outputs=outputs)
 
     return model
 
@@ -75,8 +69,8 @@ color_img = np.array(color_img)
 gray_img = np.array(gray_img)
 
 # Розбиття на тренувальну та тестову вибірки
-train_gray_img = gray_img[5000:]
-train_color_img = color_img[5000:]
+train_gray_img = gray_img[:7000]
+train_color_img = color_img[:7000]
 test_gray_img = gray_img[:1000]
 test_color_img = color_img[:1000]
 
@@ -89,20 +83,15 @@ test_color_img = np.reshape(test_color_img, (len(test_color_img), 160, 160, 3))
 
 print(train_gray_img.shape, train_color_img.shape)
 
-# Створення моделі U-Net
-# model = build_colorization_model(input_shape=(160, 160, 3))
-model = load_model('trained_model_unet')
+# Створення моделі
+model = build_colorization_model(input_shape=(160, 160, 3))
+# model = load_model('model(3)')
 
 # Компіляція моделі
-model.compile(optimizer=SGD(learning_rate=0.01), loss='mean_absolute_error', metrics=['accuracy'])
+model.compile(optimizer=Adam(learning_rate=0.001), loss='mean_absolute_error', metrics=['accuracy'], loss_weights=[1.0, 100.0])
 
 # Навчання моделі
-model.fit(train_gray_img, train_color_img, batch_size=16, epochs=10, validation_data=(test_gray_img, test_color_img))
-
-# Оцінка моделі на тестовій вибірці
-loss, accuracy = model.evaluate(test_gray_img, test_color_img)
-print('Test Loss:', loss)
-print('Test Accuracy:', accuracy)
+model.fit([train_gray_img, train_gray_img], train_color_img, batch_size=32, epochs=10, validation_data=([test_gray_img, test_gray_img], test_color_img))
 
 # Збереження моделі
 model.save('model')
