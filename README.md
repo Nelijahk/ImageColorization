@@ -28,7 +28,7 @@ To reproduce the image colorization process, follow these steps:
 		
 	`git clone https://github.com/Nelijahk/ImageColorization.git`
 		
-2. If you only want to see the final program, proceed to step 6. Else download [dataset](https://www.kaggle.com/datasets/theblackmamba31/landscape-image-colorization) in the same directory as the project
+2. If you only want to see the final program, proceed to step 6. Else download [dataset](https://www.kaggle.com/datasets/theblackmamba31/landscape-image-colorization) in the same directory as the project or you can use folder `landscape Images' where all the necessary images are stored
 		
 4. To preprocessing data you need to run **'dataset_processing.py'**:
 
