@@ -22,8 +22,6 @@ If a message appears about the absence of some library, please go to the file **
 
 ## How to Reproduce
 
-**Please use 'add-main-page' branch to run project**
-
 To reproduce the image colorization process, follow these steps:
 
 1. Clone the project repository:
