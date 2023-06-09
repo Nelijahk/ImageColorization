@@ -15,7 +15,8 @@
           border-radius:10px;
           border:3px solid #101010;
           margin:auto;
-          margin-bottom:30px;width:90%;max-width:1100px
+          margin-bottom:30px;
+          width:900px;
         }
         .model-card-container{
           display:flex;
@@ -29,19 +30,25 @@
           display:flex;
           flex-direction:column;
           margin:auto;
-          width:100%;
-          max-width:fit-content;
+          width: 400px;
           justify-content:center;
           min-width:270px;
-          padding:0px 20px 0px 20px
         }
         .model-input-col {
-            margin-left: 170px;
+            margin-left: 100px
         }
         .placeholder-image{
-            max-width: 80%;
-            height: auto;
+            width: auto;
+            height: 525px;
+            display: block;
             margin-left: 20px;
+        }
+        .result-image{
+            width: 256px;
+            height: 256px;
+            padding-bottom: 5px;
+            display: block;
+            margin: 0 auto;
         }
         .edit-buttons-container{display:flex;flex-direction:column;justify-content:center;align-items:center}
         .try-it-result-area{text-align:left;border-radius:8px;background-color:transparent;max-width:fit-content;max-height:fit-content;margin:auto; margin-top: 20px; color:#fff}
@@ -56,7 +63,7 @@
             <span class="model-input-col">
                 <h2 style="color: #99b7ea">Upload your file here</h2>
 
-                <form class="show-for-file-upload-mode" action="javascript:colorizeImage()" enctype="multipart/form-data">
+                <form action="javascript:colorizeImage()" enctype="multipart/form-data">
                     <input type="file" name="image" accept="image/*" required/>
                     <br><br>
                     <button style="background-color: #99b7ea; border-radius: 20px; margin-left: 40px; font-size: 24px; padding:3% 6%" type="submit" id="enhance-model-image">Colorize</button>
@@ -64,29 +71,44 @@
             </span>
           </div>
           <div class="model-card-col">
-            <div class="try-it-result-area" id="place_holder_picture_model">
+            <div class="try-it-result-area" id="example">
+              <h2 id="result-heading" style="text-align:center; color: white; font-size: 36px;">Try it!</h2>
               <img class="placeholder-image" src="https://miro.medium.com/v2/resize:fit:1400/format:webp/1*RQj0Lf6TzjxZzUL1svPO-A.jpeg" alt="example">
+            </div>
+            <div class="try-it-result-area" id="results" style="display: none;">
+              <h2 id="result-heading" style="text-align:center; color: white; font-size: 36px;">Result:</h2>
+                <div class="images">
+                    <img class="result-image pr-4" id="before-img" src="" alt="result">
+                    <img class="result-image" id="after-img" src="" alt="result">
+                </div>
+              <div class="edit-buttons-container">
+                <a id="download-link" href="" download style="color: #99b7ea;">Download</a>
+              </div>
             </div>
           </div>
       </div>
-        <h2 id="result-heading" style="text-align:center; color: white; font-size: 36px; display: none;">Result:</h2>
-        <img id="result-img" src="" alt="Colorized Image" style="display: none; margin: 0 auto">
-        <br>
-        <div class="edit-buttons-container">
-            <a id="download-link" href="" download style="display: none; color: #99b7ea;">Download</a>
-        </div>
     </div>
 
     <script>
+        let originalImageFile;
+
         // Функція для обробки відповіді від сервера та встановлення зображення результату
         function handleResponse() {
             // показати рядок "Result:"
-            var resultHeading = document.getElementById("result-heading");
+            var resultHeading = document.getElementById("results");
             resultHeading.style.display = "block";
+
+            var example = document.getElementById("example");
+            example.style.display = "none";
+
             // Показати зображення
-            var resultImg = document.getElementById("result-img");
-            resultImg.style.display = "block";
+            var resultImg = document.getElementById("after-img");
+            {#resultImg.style.display = "block";#}
             resultImg.src = "http://127.0.0.1:5000/colorized_image.jpg?t=" + new Date().getTime();
+
+            var beforeImg = document.getElementById("before-img");
+            beforeImg.setAttribute('src', URL.createObjectURL(originalImageFile));
+
             // Показати посилання для завантаження
             var downloadLink = document.getElementById("download-link");
             downloadLink.style.display = "inline";
@@ -96,14 +118,17 @@
         // Функція для відправки запиту на сервер
         function colorizeImage() {
             var form = document.querySelector("form");
+            originalImageFile = form.elements.image.files[0]; // Store the original image file
             var formData = new FormData(form);
+            console.log(formData, form)
 
             fetch('/colorize', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.blob())
-            .then(handleResponse);
+            .then(handleResponse)
+            .catch(error => console.error(error));
         }
     </script>
 </body>
